@@ -1,0 +1,120 @@
+# Casebook — a de-identified clinical logbook
+
+A web app (React + Supabase) where a doctor keeps a private logbook of cases and
+shares a **revocable read-only link** so a supervisor, examiner, or fellowship
+panel can view the cases and award marks. Free for users; meant to be funded by
+an institution or grant. You own it.
+
+## What's in here
+```
+supabase/schema.sql     The database: tables, row-level security, share RPCs, storage bucket
+src/                    The React app (Vite)
+.env.example            The two keys you need to fill in
+vercel.json / _redirects  SPA routing config for deploys
+```
+
+## How the privacy model works (read this)
+Every case is **de-identified by design**:
+- No patient name and no patient contact are ever stored — there are no fields for them.
+- Only optional initials + demographics + your clinical write-up + photos/video.
+- Photos go through a "cover a face" step before upload.
+- Each case gets an app-generated number (C-0001, C-0002 …).
+
+This is the right design for a teaching/assessment logbook, but it is **not a
+legal exemption**. Initials + age + sex + tribe + a photo can still identify
+someone. Before real data goes in: register as a data controller with Uganda's
+PDPO, build patient consent into your workflow, and have a short review with a
+local data-protection or medical-ethics person. Your name is on this.
+
+## Setup (about 20 minutes)
+
+### 1. Create a Supabase project
+Go to supabase.com → New project. Pick a region (closest to your users).
+
+### 2. Create the database
+Supabase dashboard → **SQL Editor** → New query → paste all of
+`supabase/schema.sql` → **Run**. This builds every table, the security policies,
+the share functions, and the `case-media` storage bucket.
+
+### 3. Get your keys
+Dashboard → **Project Settings → API**. Copy the **Project URL** and the
+**anon public** key.
+
+### 4. Wire up the app
+```bash
+cp .env.example .env      # then paste your URL + anon key into .env
+npm install
+npm run dev               # open the printed localhost URL
+```
+
+### 5. Make yourself the administrator
+Sign up once in the app. Then in the SQL Editor run (with your email):
+```sql
+update public.profiles set role = 'admin'
+where id = (select id from auth.users where email = 'you@example.com');
+```
+Reload — an **Admin** link appears in the header.
+
+### 6. Deploy
+Push this folder to a GitHub repo, then import it into **Vercel** or **Netlify**.
+Add the same two environment variables (`VITE_SUPABASE_URL`,
+`VITE_SUPABASE_ANON_KEY`) in the host's dashboard. Point your domain at it.
+The included `vercel.json` / `_redirects` make share links like `/s/<token>`
+work on refresh.
+
+## Roles
+- **trainee** (default) — owns a private logbook.
+- **assessor** — same, plus you'd typically share links *to* them. (Marking
+  needs no account — anyone with a link can mark.)
+- **admin** — you. Sees platform totals and the user list at `/admin`.
+
+## Money (free for users)
+Stripe doesn't operate in Uganda. For institution billing or donations use a
+local gateway — **Flutterwave, Pesapal, or Xente** — which take MTN MoMo,
+Airtel Money, and cards, and support recurring payment links. The app itself
+stays free to every doctor; the institution or a grant pays. (Billing isn't
+wired in yet — it's a deliberate next step once you pick a funder.)
+
+## Hardening (before you scale)
+- **Email confirmation rollback:** do not run `supabase/fix_signup.sql`; it is
+  deprecated because it bypassed verification. If it was run before, run
+  `supabase/remove_auto_email_confirmation.sql` once to stop future accounts
+  from being auto-confirmed.
+- **Media privacy:** the `case-media` bucket is currently public-read with
+  unguessable paths. To make it fully private, flip the bucket to private and
+  serve **signed URLs** (Supabase `createSignedUrl`) from the owner view, and
+  return signed URLs from the `get_shared_logbook` function instead of paths.
+- **Email confirmation:** turn it on in Supabase → Authentication.
+- **Backups & Pro tier:** the free tier pauses after 7 days idle — move to Pro
+  ($25/mo) before real users rely on it.
+- **Institutions & cohorts:** the `institutions` table is ready; add a cohort
+  table + membership when you onboard your first department.
+
+## Tech
+React 18, Vite, React Router, Supabase (Postgres + Auth + Storage). No backend
+server to run — Supabase is the backend.
+
+---
+
+## Putting this on GitHub & deploying
+
+This is a standard Vite + React project.
+
+**Run it on a computer**
+1. Install Node.js (LTS) from nodejs.org
+2. In the project folder: `npm install`
+3. Preview locally: `npm run dev`
+4. Build for production: `npm run build`  → output goes to the `dist/` folder
+
+**Upload to GitHub**
+- Create a new repository on github.com, then upload the contents of this folder
+  (or: `git init && git add . && git commit -m "Casus" && git branch -M main && git remote add origin <your-repo-url> && git push -u origin main`).
+- `node_modules/` and `dist/` are intentionally excluded by `.gitignore` — they are regenerated by `npm install` / `npm run build`.
+
+**Auto-deploy from GitHub (optional)**
+- In Netlify: "Add new site" → "Import from GitHub" → pick this repo.
+- Build command: `npm run build`   ·   Publish directory: `dist`
+- The Supabase keys are baked in as safe defaults, so no environment variables are required.
+
+**Database**
+- The SQL to set up / update the database lives in the `supabase/` folder. Run the files in the Supabase SQL editor.

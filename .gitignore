@@ -1,0 +1,8 @@
+node_modules
+dist
+.npm-cache
+.git-local
+.env
+.DS_Store
+*.local
+.netlify

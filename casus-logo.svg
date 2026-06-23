@@ -1,0 +1,10 @@
+<svg width="500" height="140" viewBox="0 0 500 140" xmlns="http://www.w3.org/2000/svg">
+  <rect width="140" height="140" rx="30" fill="#1B4A3A"/>
+  <g fill="none" stroke="#C0922E" stroke-width="8.5" stroke-linejoin="round">
+    <path d="M70 24 L116 70 L70 116 L24 70 Z"/>
+    <path d="M70 46 L94 70 L70 94 L46 70 Z"/>
+  </g>
+  <circle cx="70" cy="70" r="6.5" fill="#C0922E"/>
+  <text x="172" y="78" font-family="Fraunces, Georgia, serif" font-size="60" font-weight="500" fill="#1B4A3A">Casus</text>
+  <text x="174" y="108" font-family="'IBM Plex Mono', monospace" font-size="13" letter-spacing="3" fill="#9C7620">CLINICAL LOGBOOK</text>
+</svg>

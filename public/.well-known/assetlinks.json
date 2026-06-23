@@ -1,0 +1,8 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.casushealth.app",
+    "sha256_cert_fingerprints": ["0B:0C:02:3A:20:8D:6E:F8:51:0D:A4:0F:74:96:1A:00:D7:55:13:3D:68:E5:D6:C7:BA:63:11:6E:FE:65:BA:8E"]
+  }
+}]
