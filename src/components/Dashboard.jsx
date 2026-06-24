@@ -1,8 +1,9 @@
 import React from "react";
 import { generatePortfolio } from "../lib/exportCsv";
+import { summarizeProcedures } from "../lib/procedureTracking";
 
-function Bars({ data, color }) {
-  const max = Math.max(1, ...data.map((d) => d.value));
+function Bars({ data, color, maxValue }) {
+  const max = maxValue || Math.max(1, ...data.map((d) => d.value));
   if (!data.length) return <div className="note" style={{ marginTop: 0 }}>No data yet.</div>;
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 8 }}>
@@ -20,8 +21,9 @@ function Bars({ data, color }) {
   );
 }
 
-export default function Dashboard({ cases, profile, onClose }) {
+export default function Dashboard({ cases, procedures = [], profile, onClose }) {
   const total = cases.length;
+  const procSummary = summarizeProcedures(procedures, profile);
   const now = new Date();
   const dt = (c) => new Date(c.created_at || c.date || Date.now());
   const thisMonth = cases.filter((c) => { const d = dt(c); return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear(); }).length;
@@ -48,10 +50,11 @@ export default function Dashboard({ cases, profile, onClose }) {
       <div className="modal" onClick={(e) => e.stopPropagation()}>
         <div className="mhead"><span className="t serif">Dashboard</span><button className="x" onClick={onClose}>×</button></div>
         <div className="mbody">
-          <div className="statgrid" style={{ gridTemplateColumns: "repeat(3,1fr)" }}>
+          <div className="statgrid dashboardstats">
             <div className="stat"><div className="n">{total}</div><div className="l">Total cases</div></div>
             <div className="stat"><div className="n">{thisMonth}</div><div className="l">This month</div></div>
             <div className="stat"><div className="n">{thisYear}</div><div className="l">This year</div></div>
+            <div className="stat"><div className="n">{procSummary.total}</div><div className="l">Procedures</div></div>
           </div>
           {nextMs && total > 0 && (
             <div className="note" style={{ marginTop: 0, marginBottom: 12 }}>{nextMs - total} more case{nextMs - total === 1 ? "" : "s"} to reach your next milestone of {nextMs}.</div>
@@ -60,9 +63,19 @@ export default function Dashboard({ cases, profile, onClose }) {
           <div className="sec"><h4>Cases by month</h4><Bars data={byMonth} color="var(--gold)" /></div>
           <div className="sec"><h4>By specialty</h4><Bars data={countBy("specialty")} /></div>
           <div className="sec"><h4>By level of involvement</h4><Bars data={countBy("involvement")} /></div>
+          <div className="sec"><h4>Procedure counts</h4><Bars data={procSummary.byName} color="var(--gold)" /></div>
+          <div className="sec"><h4>Competency progress</h4><Bars data={procSummary.progress.map((p) => ({ label: `${p.name} (${p.count}/${p.target})`, value: p.percent }))} maxValue={100} /></div>
+          <div className="sec"><h4>Missing competencies</h4>
+            {procSummary.missing.length === 0 ? <div className="note" style={{ marginTop: 0 }}>No missing competencies for current targets.</div>
+              : procSummary.missing.slice(0, 8).map((p) => (
+                <div className="tablerow" key={`${p.specialty}-${p.name}`}>
+                  <span>{p.name}</span><span className="role">{p.missing} more</span>
+                </div>
+              ))}
+          </div>
 
           <div className="actions">
-            <button className="btn pri" disabled={!total} onClick={() => generatePortfolio(cases, fullName, profile)}>Download portfolio</button>
+            <button className="btn pri" disabled={!total && !procedures.length} onClick={() => generatePortfolio(cases, fullName, profile, procedures)}>Generate Portfolio PDF</button>
           </div>
         </div>
       </div>

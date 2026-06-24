@@ -54,3 +54,50 @@ export const INVOLVEMENT = [
   "Performed independently",
   "Lead clinician / managed",
 ];
+
+export const PROCEDURE_ROLES = [
+  "Observed",
+  "Assisted",
+  "Performed under supervision",
+  "Performed independently",
+];
+
+export const COMPETENCY_ROLES = [
+  "Performed under supervision",
+  "Performed independently",
+];
+
+export const PROCEDURE_TARGETS = [
+  { specialty: "Core", name: "Suturing", target: 10 },
+  { specialty: "Core", name: "Incision and drainage", target: 5 },
+  { specialty: "Core", name: "Wound debridement", target: 5 },
+  { specialty: "Core", name: "Peripheral IV cannulation", target: 20 },
+  { specialty: "General Surgery", name: "Appendicectomy", target: 5 },
+  { specialty: "General Surgery", name: "Hernia repair", target: 5 },
+  { specialty: "General Surgery", name: "Laparotomy", target: 3 },
+  { specialty: "Obstetrics & Gynaecology", name: "Normal vaginal delivery", target: 20 },
+  { specialty: "Obstetrics & Gynaecology", name: "Caesarean section", target: 10 },
+  { specialty: "Obstetrics & Gynaecology", name: "Perineal repair", target: 10 },
+  { specialty: "Anaesthesia & Critical Care", name: "Endotracheal intubation", target: 20 },
+  { specialty: "Anaesthesia & Critical Care", name: "Spinal anaesthesia", target: 20 },
+  { specialty: "Anaesthesia & Critical Care", name: "Resuscitation leadership", target: 10 },
+  { specialty: "Emergency Medicine", name: "Trauma primary survey", target: 20 },
+  { specialty: "Emergency Medicine", name: "Chest drain insertion", target: 5 },
+  { specialty: "Emergency Medicine", name: "Fracture reduction", target: 10 },
+  { specialty: "Internal Medicine", name: "Lumbar puncture", target: 5 },
+  { specialty: "Internal Medicine", name: "Pleural aspiration", target: 5 },
+  { specialty: "Internal Medicine", name: "Ascitic tap", target: 10 },
+  { specialty: "Paediatrics", name: "Neonatal resuscitation", target: 10 },
+  { specialty: "Paediatrics", name: "Paediatric lumbar puncture", target: 5 },
+  { specialty: "Orthopaedics", name: "Closed fracture reduction", target: 10 },
+  { specialty: "Orthopaedics", name: "Plaster application", target: 20 },
+  { specialty: "Orthopaedics", name: "Joint aspiration", target: 5 },
+  { specialty: "Urology", name: "Urethral catheterisation", target: 20 },
+  { specialty: "Urology", name: "Suprapubic catheterisation", target: 5 },
+  { specialty: "ENT (Otolaryngology)", name: "Ear toilet", target: 10 },
+  { specialty: "ENT (Otolaryngology)", name: "Nasal packing", target: 5 },
+  { specialty: "Ophthalmology", name: "Slit lamp examination", target: 20 },
+  { specialty: "Ophthalmology", name: "Foreign body removal", target: 5 },
+  { specialty: "Dental Surgery", name: "Dental extraction", target: 20 },
+  { specialty: "Oral & Maxillofacial Surgery", name: "Dentoalveolar extraction", target: 20 },
+];

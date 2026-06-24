@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { getCaseMedia, publicUrl, getMarksForOwner, listFollowUps, addFollowUp, deleteFollowUp, listAssessments, uploadImageBlob } from "../lib/api";
+import { getCaseMedia, publicUrl, getMarksForOwner, listFollowUps, addFollowUp, deleteFollowUp, listAssessments, listCaseReviews, uploadImageBlob } from "../lib/api";
 import { resizeImage } from "../lib/media";
 import DictateButton from "./DictateButton";
 
@@ -51,12 +51,14 @@ export default function CaseDetail({ c, onClose, onEdit, onDelete }) {
   const [fuPhotos, setFuPhotos] = useState([]);
 
   const [assessments, setAssessments] = useState([]);
+  const [reviews, setReviews] = useState([]);
   const loadFus = () => listFollowUps(c.id).then(setFus);
   useEffect(() => {
     getCaseMedia(c.id).then(setMedia);
     getMarksForOwner().then((all) => setMark(all.find((m) => m.case_id === c.id) || null));
     loadFus();
     listAssessments(c.id).then(setAssessments);
+    listCaseReviews(c.id).then(setReviews);
   }, [c.id]);
 
   const progressNotes = fus.filter((f) => f.type === "progress");
@@ -175,6 +177,21 @@ export default function CaseDetail({ c, onClose, onEdit, onDelete }) {
           {mark && (
             <div className="markpanel"><h4>Assessor mark</h4>
               <p style={{ fontSize: 14.5 }}><b>{mark.score}</b>{mark.comment ? " — " + mark.comment : ""}{mark.assessor_name ? "  (" + mark.assessor_name + ")" : ""}</p></div>
+          )}
+          {reviews.length > 0 && (
+            <div className="markpanel"><h4>Supervisor review history</h4>
+              {reviews.map((r) => (
+                <div key={r.id} className="fuitem">
+                  <div className="d">
+                    {r.created_at ? new Date(r.created_at).toISOString().slice(0, 10) : ""}
+                    {" - "}{r.supervisor_name || "Supervisor"}
+                    {r.supervisor_role ? " (" + r.supervisor_role + ")" : ""}
+                    {" - "}{r.score}/10
+                  </div>
+                  {r.comments && <div className="n">{r.comments}</div>}
+                </div>
+              ))}
+            </div>
           )}
           <div className="detail-actions">
             <button className="btn sm" onClick={() => onEdit(c)}>Edit</button>

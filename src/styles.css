@@ -133,6 +133,8 @@ a{color:var(--gold-dk)}
 .banner{background:var(--ink);color:#fff;text-align:center;font-family:'IBM Plex Mono';font-size:11.5px;letter-spacing:.08em;padding:8px;text-transform:uppercase}
 .statgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
 @media(max-width:600px){.statgrid{grid-template-columns:repeat(2,1fr)}}
+.dashboardstats{grid-template-columns:repeat(4,1fr)}
+@media(max-width:600px){.dashboardstats{grid-template-columns:repeat(2,1fr)}}
 .stat{background:var(--card);border:1px solid var(--line);border-radius:3px;padding:16px}
 .stat .n{font-family:'Fraunces';font-weight:500;font-size:30px;line-height:1}
 .stat .l{font-family:'IBM Plex Mono';font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2);margin-top:6px}
@@ -307,6 +309,49 @@ a,.linkbtn{color:var(--accent-dk)}
 
 @media(min-width:1280px){
   .list{grid-template-columns:repeat(3,1fr)}
+}
+
+.casecheck{display:flex;align-items:flex-start;padding-top:3px;cursor:pointer}
+.casecheck input{width:18px;height:18px;accent-color:var(--accent)}
+.reviewbar{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:14px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;box-shadow:0 6px 22px rgba(21,41,77,.05)}
+.reviewactions{display:flex;gap:8px;flex-wrap:wrap}
+.reviewtoken{flex:1 1 100%;margin-top:2px}
+.reviewlist{display:flex!important;flex-direction:column!important;gap:16px}
+.reviewcase{cursor:default;align-items:flex-start}
+.reviewcase:hover{transform:none;box-shadow:none}
+.reviewerbox{margin-bottom:16px}
+.modal.wide{max-width:980px}
+.procstats{grid-template-columns:repeat(4,1fr);margin-bottom:16px}
+.procgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.procpanel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;box-shadow:0 6px 22px rgba(21,41,77,.05)}
+.procpanel h4{font-family:'IBM Plex Mono';font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent-dk);margin-bottom:10px}
+.targetrow{display:grid;grid-template-columns:minmax(0,1fr) 140px;gap:12px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line)}
+.targetrow b{display:block;font-size:14px;color:var(--ink)}
+.targetrow span{display:block;font-family:'IBM Plex Mono';font-size:10.5px;color:var(--ink2);margin-top:3px}
+.progbar{height:9px;background:var(--line);border-radius:999px;overflow:hidden}
+.progbar span{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--gold));border-radius:999px}
+.missingrow{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--line);font-size:14px}
+.missingrow b{font-family:'IBM Plex Mono';font-size:12px;color:var(--ink2);white-space:nowrap}
+.procform{margin-bottom:14px}
+.formtitle{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:4px}
+.checkrow{display:flex;align-items:center;gap:9px;margin:4px 0 14px;font-weight:600;color:var(--ink)}
+.checkrow input{width:18px;height:18px;accent-color:var(--accent)}
+.proclist{display:flex;flex-direction:column;gap:10px}
+.procitem{display:flex;justify-content:space-between;gap:12px;border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--paper)}
+.procname{font-family:'Fraunces';font-size:18px;font-weight:600;color:var(--ink)}
+.procmeta{font-family:'IBM Plex Mono';font-size:11px;color:var(--ink2);margin-top:4px}
+.procitem p{font-size:14px;line-height:1.55;color:var(--ink);margin-top:8px;white-space:pre-wrap}
+.procactions{display:flex;gap:8px;align-items:flex-start;flex-wrap:wrap;justify-content:flex-end}
+.empty.small{margin:10px 0;padding:24px 16px;max-width:none}
+@media(max-width:640px){
+  .reviewbar,.reviewactions,.reviewtoken{display:flex;flex-direction:column;align-items:stretch}
+  .reviewtoken input{width:100%}
+  .entry{padding:12px;gap:10px}
+  .casecheck{padding-top:1px}
+  .procstats{grid-template-columns:repeat(2,1fr)!important}
+  .procgrid{grid-template-columns:1fr}
+  .targetrow{grid-template-columns:1fr}
+  .procitem,.procactions{flex-direction:column;align-items:stretch}
 }
 
 /* ===================== Premium auth redesign ===================== */

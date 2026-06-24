@@ -59,6 +59,53 @@ export async function deleteCase(id) {
   if (error) throw error;
 }
 
+export async function listMyProcedures() {
+  const { data: { user } } = await supabase.auth.getUser();
+  const { data, error } = await supabase
+    .from("procedures")
+    .select("*, cases(case_no,title,diagnosis)")
+    .eq("owner_id", user.id)
+    .order("procedure_date", { ascending: false })
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return data || [];
+}
+
+export async function saveProcedure(values, id) {
+  const { data: { user } } = await supabase.auth.getUser();
+  const signedOff = !!values.signed_off;
+  const payload = {
+    owner_id: user.id,
+    case_id: values.case_id || null,
+    procedure_name: (values.procedure_name || "").trim(),
+    specialty: values.specialty || null,
+    procedure_date: values.procedure_date || null,
+    role: values.role,
+    notes: (values.notes || "").trim() || null,
+    supervisor_name: (values.supervisor_name || "").trim() || null,
+    supervisor_role: (values.supervisor_role || "").trim() || null,
+    supervisor_comment: (values.supervisor_comment || "").trim() || null,
+    signed_off: signedOff,
+    signed_off_at: signedOff ? (values.signed_off_at || new Date().toISOString()) : null,
+  };
+  if (!payload.procedure_name) throw new Error("Procedure name is required.");
+  if (!payload.role) throw new Error("Role is required.");
+
+  if (id) {
+    const { data, error } = await supabase.from("procedures").update(payload).eq("id", id).select().single();
+    if (error) throw error;
+    return data;
+  }
+  const { data, error } = await supabase.from("procedures").insert(payload).select().single();
+  if (error) throw error;
+  return data;
+}
+
+export async function deleteProcedure(id) {
+  const { error } = await supabase.from("procedures").delete().eq("id", id);
+  if (error) throw error;
+}
+
 export async function uploadMedia(caseId, blob, kind, ext, section = "photo", caption = null, followUpId = null) {
   const { data: { user } } = await supabase.auth.getUser();
   const path = `${user.id}/${caseId}/${crypto.randomUUID()}.${ext}`;
@@ -130,6 +177,39 @@ export async function listAssessments(caseId) {
 }
 export async function getMarksForOwner() {
   const { data } = await supabase.from("marks").select("*");
+  return data || [];
+}
+export async function createReviewLink(caseIds, label = null) {
+  const { data, error } = await supabase.rpc("create_review_link", {
+    p_case_ids: caseIds,
+    p_label: label || null,
+  });
+  if (error) throw error;
+  return data;
+}
+export async function getReviewLink(token) {
+  const { data, error } = await supabase.rpc("get_review_link", { p_token: token });
+  if (error) throw error;
+  return data;
+}
+export async function submitSupervisorReview(token, caseId, review) {
+  const { error } = await supabase.rpc("submit_supervisor_review", {
+    p_token: token,
+    p_case_id: caseId,
+    p_supervisor_name: review.supervisor_name,
+    p_supervisor_role: review.supervisor_role,
+    p_score: review.score,
+    p_comments: review.comments,
+  });
+  if (error) throw error;
+}
+export async function listCaseReviews(caseId) {
+  const { data, error } = await supabase
+    .from("supervisor_reviews")
+    .select("id,score,comments,supervisor_name,supervisor_role,created_at")
+    .eq("case_id", caseId)
+    .order("created_at", { ascending: false });
+  if (error) return [];
   return data || [];
 }
 
