@@ -6,6 +6,7 @@ import Auth from "./components/Auth";
 import Logbook from "./components/Logbook";
 import SharedView from "./components/SharedView";
 import Admin from "./components/Admin";
+import ResetPassword from "./components/ResetPassword";
 
 function SetupNotice() {
   return (
@@ -47,6 +48,7 @@ export default function App() {
   return (
     <Routes>
       <Route path="/s/:token" element={<SharedView />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/login" element={authed ? <Navigate to="/" replace /> : <Auth />} />
       <Route path="/admin" element={authed && profile ? <Admin profile={profile} /> : <Auth />} />
       <Route path="/" element={!authed ? <Auth /> : profile ? <Logbook profile={profile} onProfileUpdated={reloadProfile} /> : <div className="load">Loading…</div>} />

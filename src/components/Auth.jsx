@@ -104,7 +104,9 @@ export default function Auth() {
     setErr(""); setMsg("");
     if (!email.trim()) { setErr("Type your email address above first, then tap Forgot password."); return; }
     try {
-      await supabase.auth.resetPasswordForEmail(email.trim(), { redirectTo: window.location.origin });
+      await supabase.auth.resetPasswordForEmail(email.trim(), {
+        redirectTo: "https://casuslog.com/reset-password",
+      });
       setMsg("If an account uses that email, a reset link is on its way. Check your inbox and spam.");
     } catch (e) { setErr(e.message || "Could not send a reset link right now."); }
   };
