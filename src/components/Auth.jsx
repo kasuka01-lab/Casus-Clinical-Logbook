@@ -20,10 +20,20 @@ const I = {
 const VERIFY_REDIRECT = "https://casuslog.com/login";
 
 const FEATURES = [
-  [I.book, "Log cases", "Capture every clinical experience"],
-  [I.camera, "Add media", "Photos & notes made simple"],
-  [I.chat, "Get feedback", "Learn and grow with insights"],
-  [I.chart, "Track growth", "Monitor progress, achieve more"],
+  [I.book, "Case Logging"],
+  [I.chart, "Procedure Tracking"],
+  [I.chat, "Supervisor Reviews"],
+  [I.camera, "Portfolio PDF Export"],
+  [I.shield, "Competency Tracking"],
+];
+
+const SPECIALTY_BADGES = ["OB/GYN", "Surgery", "ENT", "Internal Medicine", "Paediatrics", "Family Medicine"];
+
+const TRUST = [
+  [I.lock, "Encrypted Storage"],
+  [I.shield, "Protected Patient Data"],
+  [I.chat, "Supervisor Reviewed"],
+  [I.chart, "Cloud Backed"],
 ];
 
 export default function Auth() {
@@ -114,7 +124,46 @@ export default function Auth() {
   return (
     <div className="center">
       <div className="auth">
-        <div className="authcol brandcol">
+        <div className="authcol brandcol auth-showcase">
+          <div className="showcase-kicker">
+            <img src="/casus-mark.png" alt="" />
+            <span>Casus Clinical Logbook</span>
+          </div>
+          <h1 className="serif">Log. Reflect. Learn. Advance.</h1>
+          <p className="showcase-sub">The modern clinical logbook for doctors, residents and specialists.</p>
+
+          <div className="product-panel">
+            <div className="panel-top">
+              <span>Portfolio readiness</span>
+              <b>Live</b>
+            </div>
+            <div className="metric-strip">
+              <div><strong>148</strong><span>Cases</span></div>
+              <div><strong>42</strong><span>Procedures</span></div>
+              <div><strong>18</strong><span>Reviews</span></div>
+            </div>
+            <div className="showcase-bars">
+              <div><span>Surgery</span><i style={{ width: "78%" }} /></div>
+              <div><span>OB/GYN</span><i style={{ width: "66%" }} /></div>
+              <div><span>Competency</span><i style={{ width: "84%" }} /></div>
+            </div>
+          </div>
+
+          <div className="feature-grid">
+            {FEATURES.map(([icon, title]) => (
+              <div className="feature-card" key={title}>{icon}<span>{title}</span></div>
+            ))}
+          </div>
+
+          <div className="specialty-badges">
+            {SPECIALTY_BADGES.map((badge) => <span key={badge}>{badge}</span>)}
+          </div>
+
+          <div className="trust-grid">
+            {TRUST.map(([icon, title]) => (
+              <div key={title}>{icon}<span>{title}</span></div>
+            ))}
+          </div>
         <div className="auth-brand">
           <img src="/casus-brand.png" alt="Casus — Clinical Logbook" style={{ width: "100%", maxWidth: 300, margin: "0 auto", display: "block", borderRadius: 12 }} />
         </div>
