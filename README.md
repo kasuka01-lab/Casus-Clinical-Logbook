@@ -76,10 +76,6 @@ stays free to every doctor; the institution or a grant pays. (Billing isn't
 wired in yet — it's a deliberate next step once you pick a funder.)
 
 ## Hardening (before you scale)
-- **Email confirmation rollback:** do not run `supabase/fix_signup.sql`; it is
-  deprecated because it bypassed verification. If it was run before, run
-  `supabase/remove_auto_email_confirmation.sql` once to stop future accounts
-  from being auto-confirmed.
 - **Media privacy:** the `case-media` bucket is currently public-read with
   unguessable paths. To make it fully private, flip the bucket to private and
   serve **signed URLs** (Supabase `createSignedUrl`) from the owner view, and

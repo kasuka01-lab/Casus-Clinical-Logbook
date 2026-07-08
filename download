@@ -1,23 +1,11 @@
 -- ============================================================================
--- Casus — enable document uploads, admitted-patient daily progress, and the
--- next-review date. Matches the app code. Safe to run once (idempotent).
--- Run: Supabase -> SQL Editor -> paste -> Run.
+-- Casus — add supervisor qualification to cases, and surface it in the
+-- shared (examiner) view and the admin view.
+-- Run once: Supabase -> SQL Editor -> paste -> Run.
 -- ============================================================================
+alter table public.cases add column if not exists supervisor_qualification text;
 
--- allow document/file uploads alongside images and videos
-alter table public.case_media drop constraint if exists case_media_kind_check;
-alter table public.case_media add constraint case_media_kind_check check (kind in ('image','video','file'));
-
--- admission details + review reminder
-alter table public.cases add column if not exists admitted       boolean not null default false;
-alter table public.cases add column if not exists admission_date date;
-alter table public.cases add column if not exists ward           text;
-alter table public.cases add column if not exists next_review    date;
-
--- dated notes: 'progress' (daily, while admitted) or 'followup' (after discharge)
-alter table public.follow_ups add column if not exists type text not null default 'followup';
-
--- shared (examiner) view — include new fields; still hides patient identity
+-- shared logbook (examiner) — add supervisor_qualification; still hides patient identity
 create or replace function public.get_shared_logbook(p_token text)
 returns json language plpgsql stable security definer set search_path = public as $$
 declare v_owner uuid; v_name text; v_cases json;
@@ -30,11 +18,11 @@ begin
   from (
     select cs.id, cs.case_no, cs.patient_initials, cs.date, cs.age, cs.sex, cs.tribe,
            cs.title, cs.diagnosis, cs.specialty, cs.category, cs.involvement,
-           cs.supervisor, cs.supervisor_qualification, cs.admitted, cs.ward, cs.admission_date, cs.next_review,
+           cs.supervisor, cs.supervisor_qualification,
            cs.description, cs.management, cs.challenges, cs.discussion, cs.created_at,
            (select coalesce(json_agg(json_build_object('kind', m.kind, 'path', m.storage_path, 'section', m.section)), '[]'::json)
               from public.case_media m where m.case_id = cs.id) as media,
-           (select coalesce(json_agg(json_build_object('date', f.date, 'note', f.note, 'type', f.type) order by f.created_at), '[]'::json)
+           (select coalesce(json_agg(json_build_object('date', f.date, 'note', f.note) order by f.created_at), '[]'::json)
               from public.follow_ups f where f.case_id = cs.id) as followups,
            (select row_to_json(mk) from public.marks mk where mk.case_id = cs.id and mk.share_token = p_token) as mark
     from public.cases cs where cs.owner_id = v_owner
@@ -43,7 +31,7 @@ begin
 end; $$;
 grant execute on function public.get_shared_logbook(text) to anon, authenticated;
 
--- admin view — include new fields; still hides patient identity
+-- admin view — add supervisor_qualification; still hides patient identity
 create or replace function public.admin_all_cases()
 returns json language plpgsql stable security definer set search_path = public as $$
 declare v_is_admin boolean; v_result json;
@@ -54,12 +42,12 @@ begin
   from (
     select cs.id, cs.case_no, cs.date, cs.age, cs.sex, cs.tribe,
            cs.title, cs.diagnosis, cs.specialty, cs.category, cs.involvement,
-           cs.supervisor, cs.supervisor_qualification, cs.admitted, cs.ward, cs.admission_date, cs.next_review,
+           cs.supervisor, cs.supervisor_qualification,
            cs.description, cs.management, cs.challenges, cs.discussion, cs.created_at, cs.owner_id,
            coalesce(nullif(trim(coalesce(p.first_name,'') || ' ' || coalesce(p.surname,'')), ''), p.full_name, 'Unknown') as owner_name,
            p.institution as owner_institution,
            (select coalesce(json_agg(json_build_object('kind', m.kind, 'path', m.storage_path, 'section', m.section)), '[]'::json) from public.case_media m where m.case_id = cs.id) as media,
-           (select coalesce(json_agg(json_build_object('date', f.date, 'note', f.note, 'type', f.type) order by f.created_at), '[]'::json) from public.follow_ups f where f.case_id = cs.id) as followups
+           (select coalesce(json_agg(json_build_object('date', f.date, 'note', f.note) order by f.created_at), '[]'::json) from public.follow_ups f where f.case_id = cs.id) as followups
     from public.cases cs join public.profiles p on p.id = cs.owner_id
   ) r;
   return v_result;
